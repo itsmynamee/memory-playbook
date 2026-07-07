@@ -16,13 +16,16 @@ warn=0
 echo "== Orphan check: every file reachable from an entry file (MEMORY.md, any domain-*.md, project-map.md, playbook.md) =="
 # A reference counts only as an explicit link: [[name]] or name.md - fixed-string matched,
 # so short names are never masked by longer ones (pay vs payments) and dots are literal.
+# A file mentioning its own name does NOT count - self-references can't adopt an orphan.
 entry_files=(MEMORY.md)
 for e in domain-*.md project-map.md playbook.md; do [ -e "$e" ] && entry_files+=("$e"); done
 for f in *.md; do
   n="${f%.md}"
   [ "$n" = "MEMORY" ] && continue
-  if ! grep -qF -- "[[${n}]]" "${entry_files[@]}" 2>/dev/null \
-     && ! grep -qF -- "${n}.md" "${entry_files[@]}" 2>/dev/null; then
+  refs=()
+  for e in "${entry_files[@]}"; do [ "$e" != "$f" ] && refs+=("$e"); done
+  if ! grep -qF -- "[[${n}]]" "${refs[@]}" 2>/dev/null \
+     && ! grep -qF -- "${n}.md" "${refs[@]}" 2>/dev/null; then
     echo "ORPHAN: $n (no [[${n}]] or ${n}.md link in any entry file)"
     fail=1
   fi

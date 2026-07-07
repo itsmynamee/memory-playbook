@@ -42,7 +42,7 @@ pointers to episode files. Usage rules:
 
 ## 🔒 LOCKED — never edit, weaken, or delete without asking the owner first
 
-<move protected process rules here as they accumulate; each file carries protected: true>
+<move protected process rules here as they accumulate — verbatim, keeping dates and attribution>
 
 ## Domain map (look here, dive into the file — status lives THERE)
 
@@ -168,7 +168,12 @@ metadata:
 
 <Full detail: what/why/how, decisions with reasoning, commit hashes, migration numbers.>
 
-<If interrupted:>
+<If interrupted mid-work on OUR side:>
 ## Resume checklist (in order)
 1. <exact, self-contained steps a successor session can follow without this conversation>
+
+<If instead the only remaining steps are the owner's (episode technically done on our side):
+no IN PROGRESS marker in the domain — say WAITING ON OWNER there, put the owner's action in
+MEMORY.md's owner-owes block, and keep a short closing checklist here (what to update where
+once the owner acts).>
 ```

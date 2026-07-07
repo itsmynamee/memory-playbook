@@ -41,19 +41,19 @@ Why this shape works: MEMORY.md stays a few KB forever; a session working on pay
 ## Bootstrap (fresh project)
 
 1. Read `references/templates.md` and copy the MEMORY.md skeleton into the memory dir.
-2. Write `project-map.md`: derive stable facts from the repo (what the product is, repos/services, architecture invariants that must not be violated, how work is verified before "done", key code entry points). Interview the owner only for what the code can't tell you (business context, external services); when interviewing isn't possible, write the best guess and mark it `(ASSUMED)` — a future session must be able to tell confirmed facts from guesses, and should upgrade ASSUMED entries as the owner confirms them. Status never goes here.
+2. Write `project-map.md`: derive stable facts from the repo (what the product is, repos/services, architecture invariants that must not be violated, how work is verified before "done", key code entry points). Interview the owner only for what the code can't tell you (business context, external services); when interviewing isn't possible, write the best guess and mark it `(ASSUMED)` — a future session must be able to tell confirmed facts from guesses, and should upgrade ASSUMED entries as the owner confirms them. Status never goes here. Two edge cases: a convention not yet applied everywhere → the rule itself lives here, the unfinished tail is status in the owning domain; a stable fact mid-transition (something being decommissioned/replaced) → record the current truth here with an inline note to update/remove the line when the transition ends.
 3. Write `playbook.md` from the template. Seed the philosophy/red-flags sections with anything already known about the owner's preferences; leave the lessons journal empty — it fills itself via the self-learning protocol.
 4. Create 2-5 initial `domain-<area>.md` files matching the project's natural work areas (e.g. payments, admin-ui, public-site, infra). Don't over-split: a domain earns existence when it has status worth tracking; new domains can be added any time by adding one line to the map.
-5. Run `scripts/check_memory.sh <memory-dir>` to verify integrity.
+5. Run `<skill-dir>/scripts/check_memory.sh <memory-dir>` to verify integrity.
 
 ## Migration (existing bloated memory)
 
 1. Read the whole existing MEMORY.md and list every memory file on disk — files missing from the index (orphans) are common and must be adopted, not dropped.
 2. Cluster entries into 5-10 domains by work area. An entry that fits two domains gets a pointer in both, marked "cross-linked".
-3. For each domain: create `domain-<area>.md` with a dated "Current status" section (the in-flight facts), a shipped/history list, and a "Gotchas" section (area-specific traps).
+3. For each domain: create `domain-<area>.md` with a dated "Current status" section (the in-flight facts), a shipped/history list, and a "Gotchas" section (area-specific traps). Legacy files being adopted that lack frontmatter get it added (see `references/templates.md` for the required fields).
 4. Rebuild MEMORY.md from the template: rules + domain map + only truly cross-domain one-liners (global gotchas, "what the owner owes" block). Everything else moves into domains. Preserve any protected/LOCKED rules verbatim — never soften them during migration.
 5. Bootstrap `project-map.md` and `playbook.md` if absent (steps 2-3 above).
-6. Run `scripts/check_memory.sh <memory-dir>` — zero orphans required. Watch for name collisions: only real domain indexes may match `domain-*.md`.
+6. Run `<skill-dir>/scripts/check_memory.sh <memory-dir>` — zero orphans required. Watch for name collisions: only real domain indexes may match `domain-*.md` (a legacy file that accidentally matches gets renamed).
 
 ## Maintenance protocol (the rules that live in MEMORY.md)
 
@@ -78,6 +78,6 @@ These are the day-to-day rules. The MEMORY.md template embeds them so every futu
 ## Integrity checks
 
 Run `<skill-dir>/scripts/check_memory.sh <memory-dir>` after any reorganization and periodically during maintenance. It verifies:
-- **No orphans (hard fail):** every file is linked (`[[name]]` or `name.md`) from an entry file — MEMORY.md, a domain file, project-map, or playbook (the latter two count because they are always-read entry files).
+- **No orphans (hard fail):** every file is linked (`[[name]]` or `name.md`) from an entry file — MEMORY.md, a domain file, project-map, or playbook (the latter two count because they are always-read entry files). A file mentioning its own name does not count. Archives count as entry files deliberately: episodes moved into an archive keep their links there.
 - **Domain marker (hard fail):** every `domain-*.md` (except `*-archive.md`) carries the verbatim English token `Domain index` at the start of its frontmatter `description:`. This is a machine-checked marker — keep it in English even when all memory content is in another language.
 - **Size ceilings (warnings only):** MEMORY.md ~17KB, domains ~10KB (archives exempt).
