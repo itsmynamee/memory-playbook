@@ -29,8 +29,8 @@ pointers to episode files. Usage rules:
    in the domain.
 5. **Self-learning:** every owner correction OR self-caught mistake = a lesson recorded in
    the SAME turn: philosophy/process → playbook; area-specific code trap → domain Gotchas;
-   bug class → system-wide sweep + class file. Before every "done" — run the playbook's
-   pre-ship self-review.
+   bug class → root-cause first (see `systematic-debugging`), then system-wide sweep + class
+   file. Before every "done" — run the playbook's pre-ship self-review.
 6. **MEMORY.md changes only when:** a new domain appears, a global rule changes, or the
    owner-owes block changes. Domain past ~10KB → move shipped-history to
    `domain-<area>-archive.md` AND link the archive from the domain file.
@@ -144,7 +144,9 @@ permission.
 ## Mandatory pre-ship self-review (before every "done")
 
 1. **Verification:** <the project's full command triad — no exceptions, even for one-liners>.
-2. **Class, not instance:** does this same problem/pattern exist elsewhere? Sweep before closing.
+2. **Class, not instance:** root-cause it first (that investigation belongs to the
+   `systematic-debugging` skill) — fix only once the cause is certain, then sweep: does
+   this same problem/pattern exist elsewhere? Fix every instance before closing.
 3. **Uniformity:** new UI checked against the design checklist; states complete; measured,
    not eyeballed.
 4. **Honest states:** what does the user see on failure/empty/slow for this exact flow?
