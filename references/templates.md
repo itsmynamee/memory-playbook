@@ -44,11 +44,16 @@ pointers to episode files. Usage rules:
    collide with. Conflict found (or the entry has gone stale — its reason is gone)? Tell the
    owner right away: compact, plain language, what's wrong and why, plus your recommended fix.
    Owner decides; never silently overwrite. `(ASSUMED)` loses to a confirmed fact automatically.
+   When a new rule is *meant* to replace an old one, mark the old `(SUPERSEDED by [[<new>]] —
+   <date>: <why>)` so it's never re-flagged; if the owner defers, park it in the owner-owes
+   block prefixed `CONFLICT:` (or `STALE?:`) so it survives the session.
    For a full-store sweep of all rules at once, ask the memory-playbook skill for an Audit.
 
 ## 🔒 LOCKED — never edit, weaken, or delete without asking the owner first
 
-<move protected process rules here as they accumulate — verbatim, keeping dates and attribution>
+<move protected process rules here as they accumulate — verbatim. Each entry carries WHEN it
+was locked, WHO set it, and WHY (the reason), so a later Audit can tell a genuine conflict from
+a legitimate evolution instead of guessing. Format: `- <rule> (locked <date> by <who>: <why>)`.>
 
 ## Domain map (look here, dive into the file — status lives THERE)
 
@@ -65,6 +70,8 @@ pointers to episode files. Usage rules:
 ## What the OWNER currently owes (single place; details in domains)
 
 - <external-dashboard actions, pending decisions — with domain references>
+- `CONFLICT:` / `STALE?:` <a memory conflict or suspected-stale rule the owner deferred —
+  the two entries, the recommended fix, awaiting their call. Re-surfaced by the next Audit.>
 ```
 
 ## domain-<area>.md skeleton

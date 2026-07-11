@@ -47,8 +47,9 @@ memory/
 - **Memory that audits itself** — every time a rule is saved it's checked against the rules it
   could contradict, and the owner is told in plain language the moment two of them disagree —
   with a recommended fix, their call. An on-demand Audit sweeps the whole store at once for
-  contradictions, stale rules (the reason behind them is gone), and duplicates. No competing
-  memory tool reasons about whether your rules still *agree* with each other.
+  contradictions, stale rules (the reason behind them is gone), and duplicates. Change a rule on
+  purpose and it won't nag you about it — intentional overrides are recorded, not re-flagged.
+  No competing memory tool reasons about whether your rules still *agree* with each other.
 - **`check_memory.sh`** — one command that catches orphaned files, naming collisions, and
   size overruns before they become a mess (structure); Audit is its meaning-level sibling.
 - **Deterministic, not best-effort** — plants a one-line pointer in your project's `CLAUDE.md`
