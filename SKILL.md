@@ -1,6 +1,6 @@
 ---
 name: memory-playbook
-description: Two-tier self-learning persistent memory for Claude Code projects. Use this whenever the user wants to set up, reorganize, audit, or improve Claude's file-based memory; whenever MEMORY.md is bloated, near its size limit, or keeps getting compacted; whenever the user asks Claude to "remember things properly", "learn from mistakes", "stop repeating the same corrections", or wants project knowledge to survive across sessions. Also use it when SAVING memories in a project that already follows this system (look for a domain map in MEMORY.md).
+description: Two-tier self-learning persistent memory for Claude Code projects. Use this whenever the user wants to set up, reorganize, audit, or improve Claude's file-based memory; whenever MEMORY.md is bloated, near its size limit, or keeps getting compacted; whenever the user asks Claude to "remember things properly", "learn from mistakes", "stop repeating the same corrections", or wants project knowledge to survive across sessions; whenever the user wants Claude to check whether its own saved rules contradict each other, have gone stale, or duplicate one another. Also use it when SAVING memories in a project that already follows this system (look for a domain map in MEMORY.md).
 ---
 
 # Memory Playbook
@@ -37,6 +37,7 @@ Why this shape works: MEMORY.md stays a few KB forever; a session working on pay
 - **Bootstrap** — no memory dir, or MEMORY.md under ~2KB / only boilerplate → scaffold fresh.
 - **Migration** — MEMORY.md holds real accumulated entries in a flat list → reorganize into domains.
 - **Maintenance** — the system already exists (MEMORY.md contains a domain map) → follow its rules for the save/update at hand.
+- **Audit** — the owner asks to check/verify the memory itself ("does my memory still hold up", "check my rules"), or a periodic pass → read every rule-bearing entry at once and report contradictions, stale rules, and duplicates. Edits nothing except what the owner approves.
 
 ## Bootstrap (fresh project)
 
@@ -69,7 +70,7 @@ These are the day-to-day rules. The MEMORY.md template embeds them so every futu
 6. **MEMORY.md changes only when:** a domain is added to the map, a global rule/gotcha changes, or the owner-owes block changes. A domain growing past ~10KB → move its shipped-history into `domain-<area>-archive.md` AND link the archive from the domain file (an unlinked archive is an orphan); status + gotchas stay in the domain. Archives are exempt from the size ceiling — they exist to absorb overflow.
 7. **Episodes are never deleted to save space** — only the index layers are size-managed.
 8. Protected/LOCKED rules are untouchable without an explicit owner decision, including during any consolidation pass.
-9. **Contradiction check:** whenever a save adds or edits a rule-bearing entry (a domain Gotcha, a playbook red flag/philosophy line, a project-map invariant, or a LOCKED rule), re-read the other rule-bearing entries it could collide with — project-map, playbook, the touched domain, any cross-linked domain, MEMORY.md's global gotchas/LOCKED block — before ending the turn. Two entries saying incompatible things? Don't silently pick one: tell the owner immediately, compactly, in plain language — what the two rules are, why they conflict, your recommended resolution. The owner decides; only edit memory once they do.
+9. **Contradiction check:** whenever a save adds or edits a rule-bearing entry (a domain Gotcha, a playbook red flag/philosophy line, a project-map invariant, or a LOCKED rule), re-read the other rule-bearing entries it could collide with — project-map, playbook, the touched domain, any cross-linked domain, MEMORY.md's global gotchas/LOCKED block — before ending the turn. Two entries saying incompatible things? Don't silently pick one: tell the owner immediately, compactly, in plain language — what the two rules are, why they conflict, your recommended resolution. The owner decides; only edit memory once they do. Two refinements keep this from being noise: (a) also ask *"is the entry I'm touching still true?"* — a rule whose reason has since disappeared is stale even if nothing contradicts it, flag it the same way; (b) when the clash is between an `(ASSUMED)` fact and an owner-confirmed one, ASSUMED loses automatically — just fix it and note it, don't make the owner adjudicate. Only equal-standing clashes (two confirmed, or two assumed) need their call.
 
 ## The self-learning loop (what makes it more than a filing system)
 
@@ -78,7 +79,17 @@ These are the day-to-day rules. The MEMORY.md template embeds them so every futu
 - **Replay:** the playbook contains a mandatory pre-ship self-review (verification commands, "class not instance" sweep, uniformity check, honest failure-states check, memory updated, contradiction check). Run it before every "done" — the point is that the owner never has to ask "did you check everywhere?" again.
 - **Distill:** the lessons journal is append-only in the moment; when a pattern repeats, promote it into the structured sections (or into a red-flag list) and keep the journal entry as provenance.
 
-## Integrity checks
+## Audit mode (semantic integrity — the sibling of the structural check)
+
+`check_memory.sh` checks STRUCTURE (orphans, sizes, markers); it cannot tell whether two rules make sense together. Audit is the meaning-level pass. The per-save Contradiction check (Maintenance rule 9) only ever sees the ONE entry being written — so conflicts that predate the rule, or that accumulated during unmanaged growth, are invisible to it forever. Audit closes that gap: read every rule-bearing entry at once — project-map invariants, playbook philosophy + red flags, every domain's Gotchas, MEMORY.md's global gotchas + LOCKED block — and report, compactly and in plain language:
+
+1. **Contradictions** — two entries asserting incompatible things (rule 9, run across the whole store instead of one save).
+2. **Stale rules** — an entry that still reads as true but the reason behind it is gone (a Gotcha about a since-fixed bug, an invariant naming a decommissioned service). Flag "looks stale — still true?", never delete on your own.
+3. **Duplicates** — two entries saying the same thing in different words or domains: harmless today, a future contradiction the day one changes and the other doesn't. Propose merging to a single source with a cross-link.
+
+Output is a short numbered list — each item names the entries involved, why it's a problem, and the recommended fix. The owner decides each; Audit edits memory only for what they approve. Resolve `(ASSUMED)`-vs-confirmed automatically (ASSUMED loses) and just note it — only equal-standing conflicts reach the owner. These checks are deliberately NOT in `check_memory.sh`: they need judgement, not grep. Run Audit when the owner asks, at the end of a Migration, or periodically on a long-lived store.
+
+## Integrity checks (structural)
 
 Run `<skill-dir>/scripts/check_memory.sh <memory-dir>` after any reorganization and periodically during maintenance. It verifies:
 - **No orphans (hard fail):** every file is linked (`[[name]]` or `name.md`) from an entry file — MEMORY.md, a domain file, project-map, or playbook (the latter two count because they are always-read entry files). A file mentioning its own name does not count. Archives count as entry files deliberately: episodes moved into an archive keep their links there.

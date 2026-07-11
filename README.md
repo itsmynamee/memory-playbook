@@ -1,7 +1,8 @@
 # Memory Playbook
 
-A Claude Code skill that stops `MEMORY.md` from turning into soup, and stops you from
-correcting the same mistake twice.
+A Claude Code skill that stops `MEMORY.md` from turning into soup, stops you from
+correcting the same mistake twice, and keeps watch over its own rules so nothing quietly
+contradicts itself.
 
 **Is this for you?** If you run long, multi-session Claude Code projects and you're tired of
 watching memory bloat until it gets compacted and loses the nuance — or tired of saying "fix
@@ -43,8 +44,13 @@ memory/
 - **Bug discipline that composes with `systematic-debugging`** — root-cause first, fix, sweep
   the whole codebase for the same class, fix every instance, record it. Never "fixed the
   button on one page, left the other three broken."
+- **Memory that audits itself** — every time a rule is saved it's checked against the rules it
+  could contradict, and the owner is told in plain language the moment two of them disagree —
+  with a recommended fix, their call. An on-demand Audit sweeps the whole store at once for
+  contradictions, stale rules (the reason behind them is gone), and duplicates. No competing
+  memory tool reasons about whether your rules still *agree* with each other.
 - **`check_memory.sh`** — one command that catches orphaned files, naming collisions, and
-  size overruns before they become a mess.
+  size overruns before they become a mess (structure); Audit is its meaning-level sibling.
 - **Deterministic, not best-effort** — plants a one-line pointer in your project's `CLAUDE.md`
   during setup, so future sessions check for the domain map instead of relying on the skill
   happening to match.
