@@ -1,66 +1,54 @@
 # Memory Playbook
 
-A Claude Code skill that stops `MEMORY.md` from turning into soup, stops you from
-correcting the same mistake twice, and keeps watch over its own rules so nothing quietly
-contradicts itself.
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Agent: Claude Code](https://img.shields.io/badge/agent-Claude_Code-D97757.svg?logo=anthropic&logoColor=white)](https://github.com/anthropics/claude-code)
 
-**Is this for you?** If you run long, multi-session Claude Code projects and you're tired of
-watching memory bloat until it gets compacted and loses the nuance — or tired of saying "fix
-it everywhere, not just here" every single time — yes. If you want a fully automatic,
-zero-setup background memory, you probably want [claude-mem](https://github.com/thedotmack/claude-mem)
-instead; this is the opposite bet — manual, transparent, plain markdown, nothing hidden.
+**Transparent, self-auditing project memory for Claude Code that stays small and preserves durable lessons.**
 
-## The problem
+Memory Playbook keeps project knowledge in plain Markdown. A compact index
+routes Claude to one relevant domain at a time; detailed incidents and decisions
+live in linked episode files instead of bloating `MEMORY.md`.
 
-1. **The compaction death spiral.** A single `MEMORY.md` holding running status grows until
-   it hits the read limit, gets compacted, loses detail, grows again.
-2. **Repeating the same correction.** You catch a bug on one page, ask for a fix, and the
-   same bug is still sitting on three other pages next week — because the lesson died with
-   the conversation instead of becoming a standing check.
+Looking for the Codex edition? Use [Memory Playbook CX](https://github.com/itsmynamee/memory-playbook-cx).
 
-## Before / after
+## Why Memory Playbook
 
-```
-before:
+- **Small context footprint:** `MEMORY.md` contains rules and a domain map, never
+  live status.
+- **Durable decisions:** incidents, migrations, and interrupted work live in
+  linked episode files.
+- **Self-learning playbook:** owner corrections become reusable lessons and
+  pre-ship checks instead of disappearing with the conversation.
+- **Root-cause discipline:** recurring bug classes are fixed across the relevant
+  codebase and recorded once for future work.
+- **Self-checking rules:** Audit identifies contradictions, stale guidance, and
+  duplicate sources of truth.
+- **Deterministic discovery:** setup plants a small pointer in the project's
+  `CLAUDE.md` so future sessions find the domain map.
+- **Migration support:** existing flat or bloated memory is reorganized without
+  dropping protected rules or orphaned files.
+- **Plain files:** everything remains readable, diffable, portable, and
+  reviewable in Git.
+
+## How it works
+
+```text
 memory/
-└── MEMORY.md              # 47 KB, everything mixed together, gets compacted, loses detail
-
-after:
-memory/
-├── MEMORY.md               # index only — rules + domain map, stays a few KB forever
-├── project-map.md          # stable facts: what the project IS
-├── playbook.md             # self-learning: corrections → lessons → pre-ship checks
-├── domain-payments.md      # live status for one work area
-├── domain-admin-ui.md
-└── 2026-03-05-webhook-retry-fix.md   # full episode detail, unlimited size, never deleted
+├── MEMORY.md          # rules + domain map only
+├── project-map.md     # stable project facts
+├── playbook.md        # corrections → lessons → pre-ship checks
+├── domain-payments.md # current status + episode pointers
+├── domain-ui.md
+└── 2026-03-05-webhook-retry-fix.md
 ```
 
-## What you get
-
-- **Two-tier index** — `MEMORY.md` never holds status, so it never bloats. A session working
-  on payments loads only the payments domain.
-- **Self-learning playbook** — every owner correction becomes a recorded lesson in the same
-  turn, replayed via a mandatory pre-ship self-review before every "done".
-- **Bug discipline that composes with `systematic-debugging`** — root-cause first, fix, sweep
-  the whole codebase for the same class, fix every instance, record it. Never "fixed the
-  button on one page, left the other three broken."
-- **Memory that audits itself** — every time a rule is saved it's checked against the rules it
-  could contradict, and the owner is told in plain language the moment two of them disagree —
-  with a recommended fix, their call. An on-demand Audit sweeps the whole store at once for
-  contradictions, stale rules (the reason behind them is gone), and duplicates. Change a rule on
-  purpose and it won't nag you about it — intentional overrides are recorded, not re-flagged.
-  No competing memory tool reasons about whether your rules still *agree* with each other.
-- **`check_memory.sh`** — one command that catches orphaned files, naming collisions, and
-  size overruns before they become a mess (structure); Audit is its meaning-level sibling.
-- **Deterministic, not best-effort** — plants a one-line pointer in your project's `CLAUDE.md`
-  during setup, so future sessions check for the domain map instead of relying on the skill
-  happening to match.
-- **Migration mode** — already have a bloated `MEMORY.md`? It reorganizes into domains without
-  dropping anything, orphans included.
+Claude opens only the domain relevant to the task, then follows episode links
+when full detail is needed. `check_memory.sh` verifies the file graph and naming
+rules; Audit handles meaning-level conflicts that require judgment.
 
 ## Install
 
-Global (available in every project):
+Global, available in every project:
 
 ```bash
 git clone https://github.com/itsmynamee/memory-playbook.git ~/.claude/skills/memory-playbook
@@ -72,38 +60,74 @@ Project-only:
 git clone https://github.com/itsmynamee/memory-playbook.git .claude/skills/memory-playbook
 ```
 
-Then just keep working. On a fresh project it bootstraps memory from what it can read off
-your repo; on a project with an already-bloated `MEMORY.md` it migrates instead of starting
-over. Ask for it explicitly any time: *"set up memory for this project."*
+Then ask Claude to set up memory for the project. On a fresh project the skill
+bootstraps the smallest useful store; when memory already exists, it migrates the
+current content instead of starting over.
 
-**Updating:** it's a plain git clone, not a managed install — there's no auto-update. Pull
-the latest whenever you want it:
+Updates are manual because the installation is a plain Git clone:
 
 ```bash
 git -C ~/.claude/skills/memory-playbook pull
 ```
 
-## Why not just use Auto Memory / Auto Dream / claude-mem?
+## Modes
 
-- **Claude Code's native Auto Memory / Auto Dream** are heading the same direction (index +
-  topic files, automatic consolidation) — great once fully rolled out. This works today, and
-  every file stays plain, readable, git-diffable markdown you can inspect and edit yourself,
-  not a black box.
-- **[claude-mem](https://github.com/thedotmack/claude-mem)** is bigger and fully automatic —
-  SQLite + vector search, zero-touch capture. If you want hands-off, use it. This is for when
-  you'd rather see and control exactly what gets remembered.
-- **Cline-style memory banks** popularized "markdown files as an external brain" for other
-  tools. This is the Claude Code-native version, with an actual self-learning loop and an
-  integrity check on top, not just a file convention.
+| Mode | Use it when | Result |
+| --- | --- | --- |
+| Bootstrap | The project has no durable memory | Creates the smallest useful store and a `CLAUDE.md` pointer |
+| Migration | Existing memory is flat or bloated | Reorganizes it without dropping protected rules or orphaned files |
+| Learning | The owner corrects a recurring mistake | Records a reusable lesson and pre-ship check |
+| Audit | Rules may conflict, duplicate, or be stale | Reports semantic problems and recommends a resolution |
+| Integrity check | The memory graph may be broken | Finds orphaned files, naming collisions, and size overruns |
 
-## What this is NOT
+## Example prompts
 
-- Not a vector database or semantic search — matching is exact links (`[[name]]` / `name.md`),
-  checked by a plain bash script.
-- Not fully automatic — Claude follows this protocol explicitly; nothing runs in the
-  background.
-- Not a replacement for git history — episode files record decisions and reasoning, not diffs.
+```text
+Set up memory for this project.
+Migrate this bloated MEMORY.md without losing anything.
+Audit our saved rules for contradictions and stale guidance.
+Save this correction as a reusable lesson for future work.
+```
+
+## Safety boundaries
+
+- Memory stays in transparent project Markdown, not a database or hidden
+  background service.
+- Setup changes the project pointer deliberately; it does not depend on the
+  skill matching by chance in every future session.
+- Audit reports contradictions and lets the owner decide how to resolve them.
+- Episode files preserve decisions and reasoning, not Git diffs or raw chat
+  transcripts.
+- The workflow is explicit, not a zero-touch capture system.
+
+## Integrity check
+
+```bash
+bash scripts/check_memory.sh <memory-dir>
+```
+
+The checker rejects orphaned Markdown files and fake `domain-*` indexes, and
+warns when index files exceed their intended size. Audit remains responsible
+for semantic conflicts because those require judgment.
+
+## Alternatives
+
+- **Claude Code Auto Memory / Auto Dream** follows a similar index-and-topic
+  direction with automatic consolidation. Memory Playbook is the transparent,
+  project-controlled option.
+- **[claude-mem](https://github.com/thedotmack/claude-mem)** provides automatic
+  SQLite and vector-search capture. Choose it when hands-off collection matters
+  more than explicit Markdown control.
+- **Cline-style memory banks** established Markdown files as an external brain;
+  Memory Playbook adds a self-learning loop, semantic Audit, and structural
+  integrity checking.
+
+## Scope
+
+Memory Playbook is not a vector database, semantic-search system, background
+daemon, or replacement for Git history. It is a Claude Code workflow for small,
+inspectable project memory with durable decisions and explicit owner control.
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+[MIT](LICENSE) © 2026 itsmynamee
